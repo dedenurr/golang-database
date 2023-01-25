@@ -9,10 +9,10 @@ import (
 )
 
 func TestExecSql(t *testing.T) {
-	db := GetConnection()
-	defer db.Close()
+	db := GetConnection()// connect ke db
+	defer db.Close()// close db jika sudah tidak digunakan, menggunakan defer agar kode dibawahnya tetap dijalankan terlebih dahulu
 
-	ctx := context.Background()
+	ctx := context.Background()// proses cancellation dan passing value
 	
 	script := "INSERT INTO customer(id,name) VALUES('2','budi'),('3','boy')"
 	_, err := db.ExecContext(ctx,script) // ExecContext disarankan hanya untuk perintah SQL yang tidak membutuhkan hasil/result seperti INSERT,UPDATE,DELETE
@@ -26,11 +26,11 @@ func TestExecSql(t *testing.T) {
 }
 
 func TestQuerySql(t *testing.T)  {
-	db := GetConnection()
-	defer db.Close()
+	db := GetConnection()// connect ke db
+	defer db.Close()// close db jika sudah tidak digunakan, menggunakan defer agar kode dibawahnya tetap dijalankan terlebih dahulu
 
-	ctx := context.Background()
-	
+	ctx := context.Background()// proses cancellation dan passing value
+		
 	script := "SELECT id, name FROM customer"
 	rows, err := db.QueryContext(ctx,script) // QueryContext disarankan hanya untuk perintah SQL yang membutuhkan hasil/result seperti SELECT
 
@@ -38,6 +38,8 @@ func TestQuerySql(t *testing.T)  {
 		panic(err)
 	}
 
+	
+	// proses menampilkan data
 	for rows.Next() {
 		var id, name string
 		err := rows.Scan(&id, &name)
@@ -53,10 +55,11 @@ func TestQuerySql(t *testing.T)  {
 }
 
 func TestQuerySqlComplex(t *testing.T)  {
-	db := GetConnection()
-	defer db.Close()
+	db := GetConnection()// connect ke db
+	defer db.Close()// close db jika sudah tidak digunakan, menggunakan defer agar kode dibawahnya tetap dijalankan terlebih dahulu
 
-	ctx := context.Background()
+	ctx := context.Background()// proses cancellation dan passing value
+
 	
 	script := "SELECT id, name, email, balance, rating, birth_date, married, created_at FROM customer"
 	rows, err := db.QueryContext(ctx,script) // QueryContext disarankan hanya untuk perintah SQL yang membutuhkan hasil/result seperti SELECT
@@ -65,6 +68,7 @@ func TestQuerySqlComplex(t *testing.T)  {
 		panic(err)
 	}
 
+	// proses menampilkan data
 	for rows.Next() {
 		var id, name string
 		var email sql.NullString //untuk tipe data jika isian data kosong
