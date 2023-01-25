@@ -38,6 +38,7 @@ func TestQuerySql(t *testing.T)  {
 		panic(err)
 	}
 
+	defer rows.Close()
 	
 	// proses menampilkan data
 	for rows.Next() {
@@ -50,7 +51,7 @@ func TestQuerySql(t *testing.T)  {
 		fmt.Println("Id: ",id)
 		fmt.Println("Name: ",name)
 	}
-	defer rows.Close()
+	
 
 }
 
@@ -67,6 +68,8 @@ func TestQuerySqlComplex(t *testing.T)  {
 	if err != nil {
 		panic(err)
 	}
+
+	defer rows.Close()
 
 	// proses menampilkan data
 	for rows.Next() {
@@ -96,5 +99,43 @@ func TestQuerySqlComplex(t *testing.T)  {
 		fmt.Println("Created At: ",createdAt)
 		
 	}
+	
+}
+
+func TestSqlInjecton(t *testing.T)  {
+	db := GetConnection()// connect ke db
+	defer db.Close()// close db jika sudah tidak digunakan, menggunakan defer agar kode dibawahnya tetap dijalankan terlebih dahulu
+
+	ctx := context.Background()// proses cancellation dan passing value
+	
+	username := "admin'; #"
+	password := "salah"
+
+	script := "SELECT username FROM user WHERE username = '"+ username +"' AND password = '"+ password +"' LIMIT 1"
+
+	fmt.Println(script)
+
+	rows, err := db.QueryContext(ctx,script) // QueryContext disarankan hanya untuk perintah SQL yang membutuhkan hasil/result seperti SELECT
+
+	if err != nil {
+		panic(err)
+	}
+
 	defer rows.Close()
+
+	// Cek apakah username ada?
+	if rows.Next(){
+		var username string
+		
+		err := rows.Scan(&username)
+
+		if err != nil{
+			panic(err)
+		}
+
+		fmt.Println("Sukses Login",username)
+	}else{
+		fmt.Println("Gagal Login")
+	}
+	
 }
